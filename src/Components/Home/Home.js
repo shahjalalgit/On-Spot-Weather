@@ -2,10 +2,8 @@
 import { ExpandMoreRounded } from '@material-ui/icons';
 import React, { useContext, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { Route, Routes } from 'react-router-dom';
 import { userContext } from '../../App';
 import image from '../Images/bg-image.jpg';
-import LiveWeather from '../LiveWeather/LiveWeather';
 import './Home.css';
 const Home = () => {
     const [userLoggedInfo, setUserLoggedInfo] = useContext(userContext);
@@ -27,6 +25,7 @@ const Home = () => {
         const { main } = data.weather[0];
         const { deg, speed } = data.wind;
         const newTempInfo = {
+            country: data.sys.country, 
             name: data.name,
             lon: lon,
             lat: lat,
@@ -41,13 +40,10 @@ const Home = () => {
         };
         setTempInfo(newTempInfo);
     };
-    
+    console.log(userLoggedInfo);
     return (
         <div style={{ backgroundImage: `url(${image})`, backgroundSize: 'cover', height: '100vh'}}>
             <div className='container'>
-            <Routes>
-                <Route path='/liveWeather' element={<LiveWeather ></LiveWeather>}/>
-            </Routes>
                 <Form className='d-flex h-5'>
                     <div className='col-md-10'>
                         <input
@@ -68,17 +64,21 @@ const Home = () => {
                 <div className='weather-status text-white text-center'>
                     <img src='https://openweathermap.org/img/wn/02d@2x.png' alt='' />
                     <h1>{tempInfo.name}</h1>
+                    <h1>{tempInfo.country}</h1>
                     <h3>
                         <span>{tempInfo.temp}</span>&deg;C
                     </h3>
                     <h1 className='lead'>{tempInfo.main}</h1>
-                    {userLoggedInfo.email ? <p>You are logged in.</p> :<p>You are not logged in.</p>}
-                    <a className='link' href='/'>
-                        {' '}
+                    {userLoggedInfo.email ? <p>Welcome! You are logged in.</p> :<p>You are not logged in.</p>}
+                    <button id='hidebtn' onClick={() => {document.getElementById('more').style.display = "block"; document.getElementById('hidebtn').style.display = "none"}}>
                         more info
                         <ExpandMoreRounded></ExpandMoreRounded>
-                    </a>
-
+                    </button> 
+                    <div style={{display: 'none'}} id='more'>
+                        <h1 > Feels Like: {tempInfo.feels_like}, Minimum temperature: {tempInfo.temp_min}, maximum temperature: {tempInfo.temp_max}, Temperature pressure: {tempInfo.pressure}</h1>
+                        <h1>Wind deg: {tempInfo.deg}, Wind speed: {tempInfo.speed}</h1>
+                    </div>
+                    
                 </div>
             </div>
         </div>

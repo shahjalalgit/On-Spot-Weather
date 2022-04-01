@@ -1,18 +1,20 @@
 import { CloudCircleRounded } from '@material-ui/icons';
 import {
-    getAuth,
-    signOut
+    getAuth, signOut
 } from 'firebase/auth';
 import React, { useContext } from 'react';
 import { Container, Nav, Navbar } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
 import { userContext } from '../../App';
 import './Header';
 const Header = () => {
+    let navigate = useNavigate();
     const [userLoggedInfo, setUserLoggedInfo] = useContext(userContext);
     const auth = getAuth();
     const handleLogOut = async () => {
         signOut(auth);
         setUserLoggedInfo({});
+        navigate("/");
         // console.log('Sign Out Success');
     };
     return (
@@ -24,16 +26,18 @@ const Header = () => {
                             height="30"></CloudCircleRounded> {'  '}
                         On-Spot Weather
                     </Navbar.Brand>
-                    <Nav className="me-auto">
-                        <Nav.Link href="/home">Home</Nav.Link>
-                        <Nav.Link href="/liveWeather">Live Weather</Nav.Link>
-                        <Nav.Link href="/contact">Contact US</Nav.Link>
-                        <Nav.Link href="/login">LogIn</Nav.Link>
-                        {userLoggedInfo.email && <Nav.Link onClick="handleLogOut" href="/">LogOut</Nav.Link>}
+                    <Nav className="me-auto link">
+                        <Link className="nav-link" to="home" >Home</Link>
+                        <Link className="nav-link" to="liveWeather">Live Weather</Link>
+                        <Link className="nav-link" to="contact">Contact US</Link>
+                        <Link className="nav-link" to ="login">Login</Link>
+                        
                     </Nav>
-                </Container>
-            </Navbar>
-        </div>
+                    {userLoggedInfo.email ? document.getElementById('logout').style.display = 'block' : ''}
+                    <button id='logout' style={{width: "100px", display: 'none' }} onClick={handleLogOut}> LogOut </button>
+            </Container>
+        </Navbar>
+        </div >
     );
 };
 

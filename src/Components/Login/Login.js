@@ -7,6 +7,7 @@ import {
     signOut
 } from 'firebase/auth';
 import React, { useContext } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { userContext } from '../../App';
 import initializeAuthentication from '../Firebase/firebase.init';
 import googleBrandLogIn from '../Images/google-brands-logIn.svg';
@@ -18,7 +19,9 @@ initializeAuthentication();
 
 const Login = () => {
     const [userLoggedInfo, setUserLoggedInfo] = useContext(userContext);
-
+    let navigate = useNavigate();
+    let location = useLocation();
+    let from = location.state?.from?.pathname || "/";
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
     const handleSignIn = async () => {
@@ -27,6 +30,7 @@ const Login = () => {
         const userInfo = { name: displayName, email: email, photo: photoURL, success: true };
         setUserLoggedInfo(userInfo);
         userLoggedInfo.success && alert('Sign-Up Success');
+        navigate(from, { replace: true });
     };
     const handleLogOut = async () => {
         signOut(auth);
@@ -36,7 +40,7 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         if (userLoggedInfo.email && userLoggedInfo.password) {
-            console.log(userLoggedInfo.email, userLoggedInfo.password);
+            // console.log(userLoggedInfo.email, userLoggedInfo.password);
             createUserWithEmailAndPassword(auth, userLoggedInfo.email, userLoggedInfo.password)
                 .then((userCredential) => {
                     // Signed in
@@ -54,26 +58,27 @@ const Login = () => {
         }
         e.preventDefault();
     };
-    const handleLogin = (e) => {
+    const handleLogin = () => {
         if (userLoggedInfo.email && userLoggedInfo.password) {
         signInWithEmailAndPassword(auth, userLoggedInfo.email, userLoggedInfo.password)
             .then((userCredential) => {
-                // Signed in
+                console.log('singing in');
                 const user = userCredential.user;
                 // ...
-                console.log(user);
-                const newUserinfo = { ...userLoggedInfo };
-                    newUserinfo.success = true;
-                    newUserinfo.error = '';
-                    setUserLoggedInfo(newUserinfo);
-                    alert('login Success');
+                console.log('user: ',user);
+                // const newUserinfo = { ...userLoggedInfo};
+                //     newUserinfo.success = true;
+                //     newUserinfo.error = '';
+                //     newUserinfo.name = user.name;
+                //     newUserinfo.email = user.email;
+                //     setUserLoggedInfo(newUserinfo);
+                //     alert('login Success');
             })
             .catch((error) => {
                 const errorMessage = error.message;
                 alert(errorMessage);
             });
         }
-        e.preventDefault();
     };
     const handleChange = (event) => {
         let isFormValid = 'true';
@@ -92,6 +97,7 @@ const Login = () => {
             setUserLoggedInfo(newUserInfo);
         }
     };
+    console.log(userLoggedInfo);
     return (
         <div className='body'>
             <div className='main'>
@@ -142,8 +148,8 @@ const Login = () => {
                         <label for='chk' aria-hidden='true'>
                             Login
                         </label>
-                        <input type='email' name='email' placeholder='Email' required='' />
-                        <input type='password' name='password' placeholder='Password' required='' />
+                        <input onBlur={handleChange} type='email' name='email' placeholder='Email' required='' />
+                        <input onBlur={handleChange} type='password' name='password' placeholder='Password' required='' />
                         <button onClick={handleLogin}>Login</button>
                     </form>
                     <div style={{ color: 'black', textAlign: 'center' }}>

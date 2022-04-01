@@ -2,22 +2,23 @@ import React, { useState } from 'react';
 import image from '../Images/bg-image.jpg';
 const LiveWeather = () => {
     const [tempInfo, setTempInfo] = useState({});
-        if (navigator.geolocation) {
-          navigator.geolocation.watchPosition(showPosition);
+    const liveWeather = () => {   
+    if (navigator.geolocation) {
+          navigator.geolocation.watchPosition((position)=> {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            const API_KEY = `0bc4667dc34c5a4132ef507488547ddc`;
+              const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
+  
+          fetch(url)
+              .then((res) => res.json())
+              .then((data) => displayTemperature(data));
+          });
         } else { 
           alert("Geolocation is not supported by this browser.");
         }
-               
-      function showPosition(position) {
-          var lat = position.coords.latitude;
-          var lon = position.coords.longitude;
-          const API_KEY = `0bc4667dc34c5a4132ef507488547ddc`;
-            const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
+    }         
 
-        fetch(url)
-            .then((res) => res.json())
-            .then((data) => displayTemperature(data));
-      }
       const displayTemperature = (data) => {
         console.log(data);
         const { lon, lat } = data.coord;
@@ -38,9 +39,10 @@ const LiveWeather = () => {
             main: main,
         };
         setTempInfo(newTempInfo);
+        
     };
     return (
-        <div style={{ backgroundImage: `url(${image})`, backgroundSize: 'cover', height: '100vh'}}>
+        <div style={{ backgroundImage: `url(${image})`, backgroundSize: 'cover', height: '100vh'}}> {liveWeather()}
             <div className='weather-status text-white text-center'>
                     <img src='https://openweathermap.org/img/wn/02d@2x.png' alt='' />
                     <h1>{tempInfo.name}</h1>
